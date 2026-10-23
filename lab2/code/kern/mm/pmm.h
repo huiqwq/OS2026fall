@@ -58,7 +58,6 @@ size_t nr_free_pages(void); // number of free pages
         uintptr_t __m_kva = (uintptr_t)(kva);                      \
         if (__m_kva < KERNBASE) {                                  \
             panic("PADDR called with invalid kva %08lx", __m_kva); \
-            //如果你传入一个非内核虚拟地址就会报错
         }                                                          \
         __m_kva - va_pa_offset;                                    \
     })

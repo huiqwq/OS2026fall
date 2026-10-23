@@ -8,6 +8,9 @@ static free_area_t free_area;
 #define free_list (free_area.free_list)
 #define nr_free (free_area.nr_free)
 
+
+// default_init ——把链表初始化为空环
+//让其表头指向自己
 static void
 default_init(void) {
     list_init(&free_list);
@@ -23,6 +26,8 @@ default_init_memmap(struct Page *base, size_t n) {
         p->flags = p->property = 0;
         set_page_ref(p, 0);
     }
+    //空闲块 = 连续的一段空闲页（一个整体）。
+    //property = 这个空闲块包含的页数，只写在空闲块的头页
     base->property = n;
     SetPageProperty(base);
     nr_free += n;

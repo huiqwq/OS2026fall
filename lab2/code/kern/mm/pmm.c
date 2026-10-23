@@ -34,7 +34,7 @@ static void check_alloc_page(void);
 
 // init_pmm_manager - initialize a pmm_manager instance
 static void init_pmm_manager(void) {
-    pmm_manager = &default_pmm_manager;
+    pmm_manager = &best_fit_pmm_manager;
     cprintf("memory management: %s\n", pmm_manager->name);
     pmm_manager->init();
 }
@@ -62,6 +62,51 @@ size_t nr_free_pages(void) {
 }
 
 //lab2 function1 YOUR CODE
+static void page_init(void) {
+    extern char end[];
+
+    // 设置虚实地址偏移量：物理地址 = 虚拟地址 - va_pa_offset
+    va_pa_offset = PHYSICAL_MEMORY_OFFSET;
+
+    // 从设备树获取物理内存信息
+    uint64_t mem_base = get_memory_base();
+    uint64_t mem_size = get_memory_size();
+    uint64_t mem_end = mem_base + mem_size;
+
+    // 设备树信息无效时终止初始化
+    if (mem_base == 0 || mem_size == 0) {
+        panic("page_init: invalid memory info from device tree\n");
+    }
+
+    // 输出探测到的物理内存范围
+    cprintf("Physical memory map:\n");
+    cprintf("  base: 0x%016lx, size: 0x%016lx, end: 0x%016lx\n",
+            mem_base, mem_size, mem_end);
+
+    // 可管理物理页总数（物理地址上界向下对齐到页边界）
+    npage = mem_end / PGSIZE;
+
+    // pages 描述符数组放在内核镜像 end 之后，并向上对齐到页边界
+    pages = (struct Page *)ROUNDUP((uintptr_t)end, PGSIZE);
+
+    // 先默认把所有物理页都标记为保留
+    for (size_t i = 0; i < npage - nbase; i++) {
+        SetPageReserved(pages + i);
+    }
+
+    // 描述符数组结束后的第一个空闲物理地址（向上对齐到页边界）
+    uintptr_t freemem =
+        PADDR((uintptr_t)pages + sizeof(struct Page) * (npage - nbase));
+    freemem = ROUNDUP(freemem, PGSIZE);
+
+    // 把 freemem 之后的空闲页交给分配器。
+    // 注意：此时这些页仍是 reserved 状态——init_memmap 会先
+    // assert(PageReserved) 再清空 flags，从而把它们变成空闲页；
+    // 而内核镜像和描述符数组（< freemem 的页）保持 reserved，不进空闲区。
+    if (freemem < mem_end) {
+        init_memmap(pa2page(freemem), (mem_end - freemem) / PGSIZE);
+    }
+}
 
 /* pmm_init - initialize the physical memory management */
 void pmm_init(void) {

@@ -101,6 +101,8 @@ static int extract_memory_info(uintptr_t dtb_vaddr, const struct fdt_header *hea
 }
 
 // 保存解析出的系统物理内存信息
+//memory_base表示为内存起点
+//memory_size表示为内存大小
 static uint64_t memory_base = 0;
 static uint64_t memory_size = 0;
 
