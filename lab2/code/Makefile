@@ -34,6 +34,24 @@ CFLAGS  := -mcmodel=medany -std=gnu99 -Wno-unused -Werror
 CFLAGS	+= -fno-builtin -Wall -O2 -nostdinc $(DEFS)
 CFLAGS	+= -fno-stack-protector -ffunction-sections -fdata-sections
 CFLAGS	+= -g
+
+# Changing PMM or SLUB_TEST requires `make clean` before rebuilding.
+PMM ?= buddy
+ifeq ($(PMM),buddy)
+CFLAGS += -DPMM_BUDDY
+else ifeq ($(PMM),best_fit)
+CFLAGS += -DPMM_BEST_FIT
+else
+$(error Unsupported PMM '$(PMM)'; choose buddy or best_fit)
+endif
+
+SLUB_TEST ?= 0
+ifeq ($(SLUB_TEST),1)
+CFLAGS += -DSLUB_TEST=1
+else ifneq ($(SLUB_TEST),0)
+$(error Unsupported SLUB_TEST '$(SLUB_TEST)'; choose 0 or 1)
+endif
+
 CFLAGS2 = $(CFLAGS) -D ucore_test
 CTYPE	:= c S
 LD      := $(GCCPREFIX)ld

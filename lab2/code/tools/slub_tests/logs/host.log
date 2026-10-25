@@ -1,0 +1,289 @@
+COMMAND: gcc -std=gnu99 -O2 -g -nostdinc -fno-builtin -Wall -Werror -Wno-unused -DSLUB_TEST=1 -DPMM_BUDDY -I/home/hui/projects/lab2/libs -I/home/hui/projects/lab2/kern/mm -I/home/hui/projects/lab2/kern/debug -I/home/hui/projects/lab2/kern/driver /home/hui/projects/lab2/tools/slub_tests/host.c -o /tmp/ucore-slub-tests-nbww4jvz/buddy
+RUN buddy normal functional
+slub: initialized, 124 free pages unchanged
+[slub test] case 1: size boundaries
+[slub test] case 1 PASS
+[slub test] case 2: exact large pages
+[slub test] case 2 PASS (16385 bytes = 5 pages)
+[slub test] cases 3/4: multi-slab and immediate return
+[slub test] class=16 capacity=250
+[slub test] class=32 capacity=125
+[slub test] class=64 capacity=62
+[slub test] class=128 capacity=31
+[slub test] class=256 capacity=15
+[slub test] class=512 capacity=7
+[slub test] class=1024 capacity=3
+[slub test] class=2048 capacity=1
+[slub test] cases 3/4 PASS
+[slub test] case 5: mixed data and reuse (seed=20261024, 384 steps)
+[slub test] case 5 PASS
+[slub test] case 6: null and overflow
+[slub test] case 6 PASS (OOM injection is a separate host case)
+[slub test] case 7 PASS (native page records checked throughout)
+[slub test] ALL NORMAL PASS; baseline=124 restored
+slub_check: 0 slabs, 0 small objects, 0 large objects (0 pages)
+[buddy check] case 1: exact counts, continuity, ownership, data
+[buddy check] case 1 PASS
+[buddy check] case 2: isolated aligned 8-page arena and tail data
+[buddy check] case 2 PASS
+[buddy check] case 3: merge orders, busy tails and non-buddies
+[buddy check] case 3 PASS; outside holdings and arena restored
+[buddy check] case 5: zero and unrepresentable requests
+[buddy check] case 5 PASS (additional boundaries in host fixture)
+[buddy check] case 6: seed=20261024, 128 mixed steps
+[buddy check] case 6 PASS; free pages and all blocks restored
+PASS functional: full normal suite, original page frees, final baseline restored
+RUN buddy normal ordinary-coexist
+slub: initialized, 124 free pages unchanged
+[slub test] case 1: size boundaries
+[slub test] case 1 PASS
+[slub test] case 2: exact large pages
+[slub test] case 2 PASS (16385 bytes = 5 pages)
+[slub test] cases 3/4: multi-slab and immediate return
+[slub test] class=16 capacity=250
+[slub test] class=32 capacity=125
+[slub test] class=64 capacity=62
+[slub test] class=128 capacity=31
+[slub test] class=256 capacity=15
+[slub test] class=512 capacity=7
+[slub test] class=1024 capacity=3
+[slub test] class=2048 capacity=1
+[slub test] cases 3/4 PASS
+[slub test] case 5: mixed data and reuse (seed=20261024, 384 steps)
+[slub test] case 5 PASS
+[slub test] case 6: null and overflow
+[slub test] case 6 PASS (OOM injection is a separate host case)
+[slub test] case 7 PASS (native page records checked throughout)
+[slub test] ALL NORMAL PASS; baseline=121 restored
+slub_check: 0 slabs, 0 small objects, 0 large objects (0 pages)
+[buddy check] case 1: exact counts, continuity, ownership, data
+[buddy check] case 1 PASS
+[buddy check] case 2: isolated aligned 8-page arena and tail data
+[buddy check] case 2 PASS
+[buddy check] case 3: merge orders, busy tails and non-buddies
+[buddy check] case 3 PASS; outside holdings and arena restored
+[buddy check] case 5: zero and unrepresentable requests
+[buddy check] case 5 PASS (additional boundaries in host fixture)
+[buddy check] case 6: seed=20261024, 128 mixed steps
+[buddy check] case 6 PASS; free pages and all blocks restored
+PASS ordinary-coexist: full normal suite, original page frees, final baseline restored
+RUN buddy oom oom-small
+slub: initialized, 124 free pages unchanged
+PASS oom-small: real SLUB page request n=1 failed, recovery and exact free verified
+RUN buddy oom oom-large
+slub: initialized, 124 free pages unchanged
+PASS oom-large: real SLUB page request n=5 failed, recovery and exact free verified
+RUN buddy failure failure-snapshots
+slub: initialized, 124 free pages unchanged
+PASS failure-snapshots: all bytes, lists and counters unchanged
+RUN buddy invalid before-init-alloc
+PASS before-init-alloc: SLUB assertion before any observable mutation
+RUN buddy invalid before-init-free
+PASS before-init-free: SLUB assertion before any observable mutation
+RUN buddy invalid repeat-init
+slub: initialized, 124 free pages unchanged
+PASS repeat-init: SLUB assertion before any observable mutation
+RUN buddy invalid small-interior
+slub: initialized, 124 free pages unchanged
+PASS small-interior: SLUB assertion before any observable mutation
+RUN buddy invalid unused-slot
+slub: initialized, 124 free pages unchanged
+PASS unused-slot: SLUB assertion before any observable mutation
+RUN buddy invalid duplicate-live-slab
+slub: initialized, 124 free pages unchanged
+PASS duplicate-live-slab: SLUB assertion before any observable mutation
+RUN buddy invalid duplicate-reclaimed
+slub: initialized, 124 free pages unchanged
+PASS duplicate-reclaimed: SLUB assertion before any observable mutation
+RUN buddy invalid ordinary
+slub: initialized, 124 free pages unchanged
+PASS ordinary: SLUB assertion before any observable mutation
+RUN buddy invalid reserved
+slub: initialized, 124 free pages unchanged
+PASS reserved: SLUB assertion before any observable mutation
+RUN buddy invalid below-map
+slub: initialized, 124 free pages unchanged
+PASS below-map: SLUB assertion before any observable mutation
+RUN buddy invalid above-map
+slub: initialized, 124 free pages unchanged
+PASS above-map: SLUB assertion before any observable mutation
+RUN buddy invalid large-offset
+slub: initialized, 124 free pages unchanged
+PASS large-offset: SLUB assertion before any observable mutation
+RUN buddy invalid large-interior
+slub: initialized, 124 free pages unchanged
+PASS large-interior: SLUB assertion before any observable mutation
+RUN buddy invalid large-duplicate
+slub: initialized, 124 free pages unchanged
+PASS large-duplicate: SLUB assertion before any observable mutation
+RUN buddy corrupt link
+slub: initialized, 124 free pages unchanged
+PASS link: SLUB assertion before any observable mutation
+RUN buddy corrupt freelist-outside
+slub: initialized, 124 free pages unchanged
+PASS freelist-outside: SLUB assertion before any observable mutation
+RUN buddy corrupt freelist-cycle
+slub: initialized, 124 free pages unchanged
+PASS freelist-cycle: SLUB assertion before any observable mutation
+RUN buddy corrupt freelist-live
+slub: initialized, 124 free pages unchanged
+PASS freelist-live: SLUB assertion before any observable mutation
+RUN buddy corrupt bitmap
+slub: initialized, 124 free pages unchanged
+PASS bitmap: SLUB assertion before any observable mutation
+RUN buddy corrupt capacity
+slub: initialized, 124 free pages unchanged
+PASS capacity: SLUB assertion before any observable mutation
+RUN buddy corrupt offset
+slub: initialized, 124 free pages unchanged
+PASS offset: SLUB assertion before any observable mutation
+RUN buddy corrupt inuse
+slub: initialized, 124 free pages unchanged
+PASS inuse: SLUB assertion before any observable mutation
+RUN buddy corrupt wrong-list
+slub: initialized, 124 free pages unchanged
+PASS wrong-list: SLUB assertion before any observable mutation
+RUN buddy corrupt owner
+slub: initialized, 124 free pages unchanged
+PASS owner: SLUB assertion before any observable mutation
+RUN buddy corrupt original-pages
+slub: initialized, 124 free pages unchanged
+PASS original-pages: SLUB assertion before any observable mutation
+RUN buddy corrupt lower-free
+slub: initialized, 124 free pages unchanged
+PASS lower-free: SLUB assertion before any observable mutation
+COMMAND: gcc -std=gnu99 -O2 -g -nostdinc -fno-builtin -Wall -Werror -Wno-unused -DSLUB_TEST=1 -DPMM_BEST_FIT -I/home/hui/projects/lab2/libs -I/home/hui/projects/lab2/kern/mm -I/home/hui/projects/lab2/kern/debug -I/home/hui/projects/lab2/kern/driver /home/hui/projects/lab2/tools/slub_tests/host.c -o /tmp/ucore-slub-tests-nbww4jvz/best_fit
+RUN best_fit normal functional
+slub: initialized, 124 free pages unchanged
+[slub test] case 1: size boundaries
+[slub test] case 1 PASS
+[slub test] case 2: exact large pages
+[slub test] case 2 PASS (16385 bytes = 5 pages)
+[slub test] cases 3/4: multi-slab and immediate return
+[slub test] class=16 capacity=250
+[slub test] class=32 capacity=125
+[slub test] class=64 capacity=62
+[slub test] class=128 capacity=31
+[slub test] class=256 capacity=15
+[slub test] class=512 capacity=7
+[slub test] class=1024 capacity=3
+[slub test] class=2048 capacity=1
+[slub test] cases 3/4 PASS
+[slub test] case 5: mixed data and reuse (seed=20261024, 384 steps)
+[slub test] case 5 PASS
+[slub test] case 6: null and overflow
+[slub test] case 6 PASS (OOM injection is a separate host case)
+[slub test] case 7 PASS (native page records checked throughout)
+[slub test] ALL NORMAL PASS; baseline=124 restored
+slub_check: 0 slabs, 0 small objects, 0 large objects (0 pages)
+PASS functional: full normal suite, original page frees, final baseline restored
+RUN best_fit normal ordinary-coexist
+slub: initialized, 124 free pages unchanged
+[slub test] case 1: size boundaries
+[slub test] case 1 PASS
+[slub test] case 2: exact large pages
+[slub test] case 2 PASS (16385 bytes = 5 pages)
+[slub test] cases 3/4: multi-slab and immediate return
+[slub test] class=16 capacity=250
+[slub test] class=32 capacity=125
+[slub test] class=64 capacity=62
+[slub test] class=128 capacity=31
+[slub test] class=256 capacity=15
+[slub test] class=512 capacity=7
+[slub test] class=1024 capacity=3
+[slub test] class=2048 capacity=1
+[slub test] cases 3/4 PASS
+[slub test] case 5: mixed data and reuse (seed=20261024, 384 steps)
+[slub test] case 5 PASS
+[slub test] case 6: null and overflow
+[slub test] case 6 PASS (OOM injection is a separate host case)
+[slub test] case 7 PASS (native page records checked throughout)
+[slub test] ALL NORMAL PASS; baseline=121 restored
+slub_check: 0 slabs, 0 small objects, 0 large objects (0 pages)
+PASS ordinary-coexist: full normal suite, original page frees, final baseline restored
+RUN best_fit oom oom-small
+slub: initialized, 124 free pages unchanged
+PASS oom-small: real SLUB page request n=1 failed, recovery and exact free verified
+RUN best_fit oom oom-large
+slub: initialized, 124 free pages unchanged
+PASS oom-large: real SLUB page request n=5 failed, recovery and exact free verified
+RUN best_fit failure failure-snapshots
+slub: initialized, 124 free pages unchanged
+PASS failure-snapshots: all bytes, lists and counters unchanged
+RUN best_fit invalid before-init-alloc
+PASS before-init-alloc: SLUB assertion before any observable mutation
+RUN best_fit invalid before-init-free
+PASS before-init-free: SLUB assertion before any observable mutation
+RUN best_fit invalid repeat-init
+slub: initialized, 124 free pages unchanged
+PASS repeat-init: SLUB assertion before any observable mutation
+RUN best_fit invalid small-interior
+slub: initialized, 124 free pages unchanged
+PASS small-interior: SLUB assertion before any observable mutation
+RUN best_fit invalid unused-slot
+slub: initialized, 124 free pages unchanged
+PASS unused-slot: SLUB assertion before any observable mutation
+RUN best_fit invalid duplicate-live-slab
+slub: initialized, 124 free pages unchanged
+PASS duplicate-live-slab: SLUB assertion before any observable mutation
+RUN best_fit invalid duplicate-reclaimed
+slub: initialized, 124 free pages unchanged
+PASS duplicate-reclaimed: SLUB assertion before any observable mutation
+RUN best_fit invalid ordinary
+slub: initialized, 124 free pages unchanged
+PASS ordinary: SLUB assertion before any observable mutation
+RUN best_fit invalid reserved
+slub: initialized, 124 free pages unchanged
+PASS reserved: SLUB assertion before any observable mutation
+RUN best_fit invalid below-map
+slub: initialized, 124 free pages unchanged
+PASS below-map: SLUB assertion before any observable mutation
+RUN best_fit invalid above-map
+slub: initialized, 124 free pages unchanged
+PASS above-map: SLUB assertion before any observable mutation
+RUN best_fit invalid large-offset
+slub: initialized, 124 free pages unchanged
+PASS large-offset: SLUB assertion before any observable mutation
+RUN best_fit invalid large-interior
+slub: initialized, 124 free pages unchanged
+PASS large-interior: SLUB assertion before any observable mutation
+RUN best_fit invalid large-duplicate
+slub: initialized, 124 free pages unchanged
+PASS large-duplicate: SLUB assertion before any observable mutation
+RUN best_fit corrupt link
+slub: initialized, 124 free pages unchanged
+PASS link: SLUB assertion before any observable mutation
+RUN best_fit corrupt freelist-outside
+slub: initialized, 124 free pages unchanged
+PASS freelist-outside: SLUB assertion before any observable mutation
+RUN best_fit corrupt freelist-cycle
+slub: initialized, 124 free pages unchanged
+PASS freelist-cycle: SLUB assertion before any observable mutation
+RUN best_fit corrupt freelist-live
+slub: initialized, 124 free pages unchanged
+PASS freelist-live: SLUB assertion before any observable mutation
+RUN best_fit corrupt bitmap
+slub: initialized, 124 free pages unchanged
+PASS bitmap: SLUB assertion before any observable mutation
+RUN best_fit corrupt capacity
+slub: initialized, 124 free pages unchanged
+PASS capacity: SLUB assertion before any observable mutation
+RUN best_fit corrupt offset
+slub: initialized, 124 free pages unchanged
+PASS offset: SLUB assertion before any observable mutation
+RUN best_fit corrupt inuse
+slub: initialized, 124 free pages unchanged
+PASS inuse: SLUB assertion before any observable mutation
+RUN best_fit corrupt wrong-list
+slub: initialized, 124 free pages unchanged
+PASS wrong-list: SLUB assertion before any observable mutation
+RUN best_fit corrupt owner
+slub: initialized, 124 free pages unchanged
+PASS owner: SLUB assertion before any observable mutation
+RUN best_fit corrupt original-pages
+slub: initialized, 124 free pages unchanged
+PASS original-pages: SLUB assertion before any observable mutation
+RUN best_fit corrupt lower-free
+slub: initialized, 124 free pages unchanged
+PASS lower-free: SLUB assertion before any observable mutation
+RESULT: 62/62 cases passed

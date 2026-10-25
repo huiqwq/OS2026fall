@@ -1,5 +1,6 @@
 #include <default_pmm.h>
 #include <best_fit_pmm.h>
+#include <buddy_pmm.h>
 #include <defs.h>
 #include <error.h>
 #include <memlayout.h>
@@ -34,7 +35,13 @@ static void check_alloc_page(void);
 
 // init_pmm_manager - initialize a pmm_manager instance
 static void init_pmm_manager(void) {
+#if defined(PMM_BUDDY) && !defined(PMM_BEST_FIT)
+    pmm_manager = &buddy_pmm_manager;
+#elif defined(PMM_BEST_FIT) && !defined(PMM_BUDDY)
     pmm_manager = &best_fit_pmm_manager;
+#else
+#error "Select exactly one physical memory manager through Makefile PMM"
+#endif
     cprintf("memory management: %s\n", pmm_manager->name);
     pmm_manager->init();
 }
@@ -61,7 +68,7 @@ size_t nr_free_pages(void) {
     return pmm_manager->nr_free_pages();
 }
 
-//lab2 function1 YOUR CODE
+//lab2 function1 2413287
 static void page_init(void) {
     extern char end[];
 
@@ -71,11 +78,18 @@ static void page_init(void) {
     // 从设备树获取物理内存信息
     uint64_t mem_base = get_memory_base();
     uint64_t mem_size = get_memory_size();
-    uint64_t mem_end = mem_base + mem_size;
 
     // 设备树信息无效时终止初始化
     if (mem_base == 0 || mem_size == 0) {
         panic("page_init: invalid memory info from device tree\n");
+    }
+    if (mem_size > ~(uint64_t)0 - mem_base) {
+        panic("page_init: physical memory range overflows\n");
+    }
+    uint64_t mem_end = mem_base + mem_size;
+    // nbase 和启动映射使用固定 DRAM_BASE，不能描述其他起点的 RAM。
+    if (mem_base != DRAM_BASE) {
+        panic("page_init: unsupported memory base 0x%016lx\n", mem_base);
     }
 
     // 输出探测到的物理内存范围
@@ -83,28 +97,53 @@ static void page_init(void) {
     cprintf("  base: 0x%016lx, size: 0x%016lx, end: 0x%016lx\n",
             mem_base, mem_size, mem_end);
 
-    // 可管理物理页总数（物理地址上界向下对齐到页边界）
-    npage = mem_end / PGSIZE;
+    // npage 是物理页号上界；描述符和空闲区必须使用同一管理末端。
+    uintptr_t managed_end = ROUNDDOWN(
+        mem_end < PHYSICAL_MEMORY_END ? mem_end : PHYSICAL_MEMORY_END,
+        PGSIZE);
+    npage = managed_end / PGSIZE;
+    if (npage <= nbase) {
+        panic("page_init: no complete managed physical pages\n");
+    }
+    size_t page_count = npage - nbase;
+    if (page_count > ~(size_t)0 / sizeof(struct Page)) {
+        panic("page_init: page descriptor size overflows\n");
+    }
+    size_t descriptor_bytes = page_count * sizeof(struct Page);
 
     // pages 描述符数组放在内核镜像 end 之后，并向上对齐到页边界
-    pages = (struct Page *)ROUNDUP((uintptr_t)end, PGSIZE);
+    uintptr_t kernel_end = (uintptr_t)end;
+    if (kernel_end < KERNBASE || kernel_end > ~(uintptr_t)0 - (PGSIZE - 1)) {
+        panic("page_init: invalid kernel end\n");
+    }
+    uintptr_t pages_va = ROUNDUP(kernel_end, PGSIZE);
+    uintptr_t pages_pa = PADDR(pages_va);
+    // 在写入任何描述符之前，验证内核、对齐占用及整个数组均位于 RAM 内。
+    if (pages_pa < mem_base || pages_pa > managed_end ||
+        descriptor_bytes > managed_end - pages_pa) {
+        panic("page_init: kernel and page descriptors do not fit in managed RAM\n");
+    }
+    if (descriptor_bytes > ~(uintptr_t)0 - pages_va) {
+        panic("page_init: page descriptor address overflows\n");
+    }
+    uintptr_t descriptor_end_pa = pages_pa + descriptor_bytes;
+    if (descriptor_end_pa > ~(uintptr_t)0 - (PGSIZE - 1)) {
+        panic("page_init: free memory alignment overflows\n");
+    }
+    uintptr_t freemem = ROUNDUP(descriptor_end_pa, PGSIZE);
+    pages = (struct Page *)pages_va;
 
     // 先默认把所有物理页都标记为保留
-    for (size_t i = 0; i < npage - nbase; i++) {
+    for (size_t i = 0; i < page_count; i++) {
         SetPageReserved(pages + i);
     }
-
-    // 描述符数组结束后的第一个空闲物理地址（向上对齐到页边界）
-    uintptr_t freemem =
-        PADDR((uintptr_t)pages + sizeof(struct Page) * (npage - nbase));
-    freemem = ROUNDUP(freemem, PGSIZE);
 
     // 把 freemem 之后的空闲页交给分配器。
     // 注意：此时这些页仍是 reserved 状态——init_memmap 会先
     // assert(PageReserved) 再清空 flags，从而把它们变成空闲页；
     // 而内核镜像和描述符数组（< freemem 的页）保持 reserved，不进空闲区。
-    if (freemem < mem_end) {
-        init_memmap(pa2page(freemem), (mem_end - freemem) / PGSIZE);
+    if (freemem < managed_end) {
+        init_memmap(pa2page(freemem), (managed_end - freemem) / PGSIZE);
     }
 }
 

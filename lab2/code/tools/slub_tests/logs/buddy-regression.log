@@ -1,0 +1,97 @@
+COMMAND: gcc -std=gnu99 -O2 -g -nostdinc -fno-builtin -Wall -Werror -Wno-unused -I/home/hui/projects/lab2/libs -I/home/hui/projects/lab2/kern/mm -I/home/hui/projects/lab2/kern/debug -I/home/hui/projects/lab2/kern/driver /home/hui/projects/lab2/tools/buddy_tests/host.c -o /tmp/ucore-buddy-tests-11v9emae/host
+RUN normal/basic
+PASS basic
+RUN normal/tail
+PASS tail
+RUN normal/merge
+PASS merge
+RUN normal/non-buddies
+PASS non-buddies
+RUN normal/list-ends
+PASS list-ends
+RUN normal/init-ranges
+PASS init-ranges
+RUN normal/single
+PASS single
+RUN normal/maximum
+maximum available order=15, pages=32768
+PASS maximum
+RUN normal/failures
+PASS failures
+RUN normal/random
+PASS random
+RUN normal/kernel-check
+[buddy check] case 1: exact counts, continuity, ownership, data
+[buddy check] case 1 PASS
+[buddy check] case 2: isolated aligned 8-page arena and tail data
+[buddy check] case 2 PASS
+[buddy check] case 3: merge orders, busy tails and non-buddies
+[buddy check] case 3 PASS; outside holdings and arena restored
+[buddy check] case 5: zero and unrepresentable requests
+[buddy check] case 5 PASS (additional boundaries in host fixture)
+[buddy check] case 6: seed=20261024, 128 mixed steps
+[buddy check] case 6 PASS; free pages and all blocks restored
+PASS kernel-check
+RUN normal/kernel-check-small
+[buddy check] case 1: exact counts, continuity, ownership, data
+[buddy check] case 1 PASS
+[buddy check] case 2: isolated aligned 8-page arena and tail data
+[buddy check] case 2 PASS
+[buddy check] case 3: merge orders, busy tails and non-buddies
+[buddy check] case 3 PASS; outside holdings and arena restored
+[buddy check] case 5: zero and unrepresentable requests
+[buddy check] case 5 PASS (additional boundaries in host fixture)
+[buddy check] case 6: seed=20261024, 128 mixed steps
+[buddy check] case 6 PASS; free pages and all blocks restored
+PASS kernel-check-small
+RUN invalid/null
+PASS null: implementation panic before state/data change
+RUN invalid/zero
+PASS zero: implementation panic before state/data change
+RUN invalid/short
+PASS short: implementation panic before state/data change
+RUN invalid/long
+PASS long: implementation panic before state/data change
+RUN invalid/internal
+PASS internal: implementation panic before state/data change
+RUN invalid/duplicate
+PASS duplicate: implementation panic before state/data change
+RUN invalid/joined
+PASS joined: implementation panic before state/data change
+RUN invalid/reserved
+PASS reserved: implementation panic before state/data change
+RUN invalid/unregistered
+PASS unregistered: implementation panic before state/data change
+RUN invalid/before-array
+PASS before-array: implementation panic before state/data change
+RUN invalid/past-array
+PASS past-array: implementation panic before state/data change
+RUN invalid/misaligned-pointer
+PASS misaligned-pointer: implementation panic before state/data change
+RUN invalid/huge-length
+PASS huge-length: implementation panic before state/data change
+RUN invalid/overlap-registration
+PASS overlap-registration: implementation panic before state/data change
+RUN invalid/zero-registration
+PASS zero-registration: implementation panic before state/data change
+RUN invalid/range-registration
+PASS range-registration: implementation panic before state/data change
+RUN corrupt/null-link
+PASS null-link: implementation panic before state/data change
+RUN corrupt/prev-link
+PASS prev-link: implementation panic before state/data change
+RUN corrupt/count
+PASS count: implementation panic before state/data change
+RUN corrupt/size
+PASS size: implementation panic before state/data change
+RUN corrupt/alignment
+PASS alignment: implementation panic before state/data change
+RUN corrupt/inuse-page
+PASS inuse-page: implementation panic before state/data change
+RUN corrupt/overlap
+PASS overlap: implementation panic before state/data change
+RUN corrupt/unmerged
+PASS unmerged: implementation panic before state/data change
+RUN corrupt/leak
+PASS leak: implementation panic before state/data change
+RESULT: 37/37 cases passed

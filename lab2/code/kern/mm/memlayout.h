@@ -35,12 +35,24 @@ struct Page {
     int ref;                        // page frame 的引用计数器
     uint64_t flags;                 // 描述 page frame 状态的一组标志位
     unsigned int property;          // 空闲块的页数，用于 first-fit 内存管理器
+    // Buddy: 空闲块头记录块页数；已分配首记录精确页数；其他页为 0。
+    // 已分配首的 PG_property 仍为 0，不改变“仅空闲块头”的标志语义。
     list_entry_t page_link;         // page_link 是链表节点，把空闲块串成free_list
+    // SLUB only; initialized explicitly by slub_init, never reused by PMM.
+    // owner = ((head descriptor index + 1) << 2) | kind; 0 means ordinary.
+    // npages is the original page count on the owner head, 0 on interiors.
+    uintptr_t slub_owner;
+    size_t slub_npages;
 };
 
 /* Flags describing the status of a page frame */
 #define PG_reserved                 0       // if this bit=1: the Page is reserved for kernel, cannot be used in alloc/free_pages; otherwise, this bit=0 
 #define PG_property                 1       // if this bit=1: the Page is the head page of a free memory block(contains some continuous_addrress pages), and can be used in alloc_pages; if this bit=0: if the Page is the the head page of a free memory block, then this Page and the memory block is alloced. Or this Page isn't the head page.
+
+// Buddy only: on non-reserved pages, managed marks registration and free marks
+// every free page (including block interiors). Reserved pages ignore these bits.
+#define PG_buddy_managed             2
+#define PG_buddy_free                3
 
 #define SetPageReserved(page)       ((page)->flags |= (1UL << PG_reserved))
 #define ClearPageReserved(page)     ((page)->flags &= ~(1UL << PG_reserved))
