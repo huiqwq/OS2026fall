@@ -1,0 +1,20 @@
+python3 tools/slub_tests/run.py: exit=0
+python3 tools/buddy_tests/run.py: exit=0
+make PMM=buddy SLUB_TEST=1 clean: exit=0
+make PMM=buddy SLUB_TEST=1: exit=0
+timeout 45s make PMM=buddy SLUB_TEST=1 qemu: exit=124
+make PMM=best_fit SLUB_TEST=1 clean: exit=0
+make PMM=best_fit SLUB_TEST=1: exit=0
+timeout 45s make PMM=best_fit SLUB_TEST=1 qemu: exit=124
+make PMM=buddy SLUB_TEST=0 clean: exit=0
+make PMM=buddy SLUB_TEST=0: exit=0
+timeout 12s make PMM=buddy SLUB_TEST=0 qemu: exit=124
+make PMM=best_fit SLUB_TEST=0 clean: exit=0
+make PMM=best_fit SLUB_TEST=0: exit=0
+timeout 12s make PMM=best_fit SLUB_TEST=0 qemu: exit=124
+make PMM=best_fit SLUB_TEST=0 grade: exit=0
+make clean: exit=0
+make: exit=0
+RESULT: host 62/62, Buddy 37/37, QEMU normal cases both PMMs PASS; baseline restored.
+SLUB_TEST=0 both PMMs: no functional tests; PMM=best_fit grade: 20/20.
+QEMU exit=124 is the expected timeout after successful initialization/self-tests.

@@ -1,0 +1,76 @@
+#ifndef __KERN_MM_MEMLAYOUT_H__
+#define __KERN_MM_MEMLAYOUT_H__
+
+/* All physical memory mapped at this address */
+#define KERNBASE            0xFFFFFFFFC0200000 // = 0x80200000(物理内存里内核的起始位置, KERN_BEGIN_PADDR) + 0xFFFFFFFF40000000(偏移量, PHYSICAL_MEMORY_OFFSET)
+//把原有内存映射到虚拟内存空间的最后一页
+#define KMEMSIZE            0x7E00000          // the maximum amount of physical memory
+// 0x7E00000 = 0x8000000 - 0x200000
+// QEMU 缺省的RAM为 0x80000000到0x88000000, 128MiB, 0x80000000到0x80200000被OpenSBI占用
+#define KERNTOP             (KERNBASE + KMEMSIZE) // 0x88000000对应的虚拟地址
+
+#define PHYSICAL_MEMORY_END         0x88000000
+#define PHYSICAL_MEMORY_OFFSET      0xFFFFFFFF40000000
+#define KERNEL_BEGIN_PADDR          0x80200000
+#define KERNEL_BEGIN_VADDR          0xFFFFFFFFC0200000
+
+
+#define KSTACKPAGE          2                           // # of pages in kernel stack
+#define KSTACKSIZE          (KSTACKPAGE * PGSIZE)       // sizeof kernel stack
+
+#ifndef __ASSEMBLER__
+
+#include <defs.h>
+#include <list.h>
+
+typedef uintptr_t pte_t;
+typedef uintptr_t pde_t;
+
+/* *
+ * struct Page - Page descriptor structures. Each Page describes one
+ * physical page. In kern/mm/pmm.h, you can find lots of useful functions
+ * that convert Page to other data types, such as physical address.
+ * */
+struct Page {
+    int ref;                        // page frame 的引用计数器
+    uint64_t flags;                 // 描述 page frame 状态的一组标志位
+    unsigned int property;          // 空闲块的页数，用于 first-fit 内存管理器
+    // Buddy: 空闲块头记录块页数；已分配首记录精确页数；其他页为 0。
+    // 已分配首的 PG_property 仍为 0，不改变“仅空闲块头”的标志语义。
+    list_entry_t page_link;         // page_link 是链表节点，把空闲块串成free_list
+    // SLUB only; initialized explicitly by slub_init, never reused by PMM.
+    // owner = ((head descriptor index + 1) << 2) | kind; 0 means ordinary.
+    // npages is the original page count on the owner head, 0 on interiors.
+    uintptr_t slub_owner;
+    size_t slub_npages;
+};
+
+/* Flags describing the status of a page frame */
+#define PG_reserved                 0       // if this bit=1: the Page is reserved for kernel, cannot be used in alloc/free_pages; otherwise, this bit=0 
+#define PG_property                 1       // if this bit=1: the Page is the head page of a free memory block(contains some continuous_addrress pages), and can be used in alloc_pages; if this bit=0: if the Page is the the head page of a free memory block, then this Page and the memory block is alloced. Or this Page isn't the head page.
+
+// Buddy only: on non-reserved pages, managed marks registration and free marks
+// every free page (including block interiors). Reserved pages ignore these bits.
+#define PG_buddy_managed             2
+#define PG_buddy_free                3
+
+#define SetPageReserved(page)       ((page)->flags |= (1UL << PG_reserved))
+#define ClearPageReserved(page)     ((page)->flags &= ~(1UL << PG_reserved))
+#define PageReserved(page)          (((page)->flags >> PG_reserved) & 1)
+#define SetPageProperty(page)       ((page)->flags |= (1UL << PG_property))
+#define ClearPageProperty(page)     ((page)->flags &= ~(1UL << PG_property))
+#define PageProperty(page)          (((page)->flags >> PG_property) & 1)
+
+// convert list entry to page
+#define le2page(le, member)                 \
+    to_struct((le), struct Page, member)
+
+/* free_area_t - maintains a doubly linked list to record free (unused) pages */
+typedef struct {
+    list_entry_t free_list;         // the list header
+    unsigned int nr_free;           // number of free pages in this free list
+} free_area_t;
+
+#endif /* !__ASSEMBLER__ */
+
+#endif /* !__KERN_MM_MEMLAYOUT_H__ */

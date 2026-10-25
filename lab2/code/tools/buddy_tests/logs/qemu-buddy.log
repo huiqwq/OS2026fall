@@ -1,0 +1,53 @@
+
+OpenSBI v0.4 (Jul  2 2019 11:53:53)
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name          : QEMU Virt Machine
+Platform HART Features : RV64ACDFIMSU
+Platform Max HARTs     : 8
+Current Hart           : 0
+Firmware Base          : 0x80000000
+Firmware Size          : 112 KB
+Runtime SBI Version    : 0.1
+
+PMP0: 0x0000000080000000-0x000000008001ffff (A)
+PMP1: 0x0000000000000000-0xffffffffffffffff (A,R,W,X)
+DTB Init
+HartID: 0
+DTB Address: 0x82200000
+Physical Memory from DTB:
+  Base: 0x0000000080000000
+  Size: 0x0000000008000000 (128 MB)
+  End:  0x0000000087ffffff
+DTB init completed
+(THU.CST) os is loading ...
+Special kernel symbols:
+  entry  0xffffffffc02000d8 (virtual)
+  etext  0xffffffffc0202b20 (virtual)
+  edata  0xffffffffc0208018 (virtual)
+  end    0xffffffffc0210350 (virtual)
+Kernel executable memory footprint: 65KB
+memory management: buddy_pmm_manager
+Physical memory map:
+  base: 0x0000000080000000, size: 0x0000000008000000, end: 0x0000000088000000
+[buddy check] case 1: exact counts, continuity, ownership, data
+[buddy check] case 1 PASS
+[buddy check] case 2: isolated aligned 8-page arena and tail data
+[buddy check] case 2 PASS
+[buddy check] case 3: merge orders, busy tails and non-buddies
+[buddy check] case 3 PASS; outside holdings and arena restored
+[buddy check] case 5: zero and unrepresentable requests
+[buddy check] case 5 PASS (additional boundaries in host fixture)
+[buddy check] case 6: seed=20261024, 128 mixed steps
+[buddy check] case 6 PASS; free pages and all blocks restored
+check_alloc_page() succeeded!
+satp virtual address: 0xffffffffc0207000
+satp physical address: 0x0000000080207000
+qemu-system-riscv64: terminating on signal 15 from pid 38392 (make)

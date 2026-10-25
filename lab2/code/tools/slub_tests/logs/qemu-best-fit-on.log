@@ -1,0 +1,65 @@
+
+OpenSBI v0.4 (Jul  2 2019 11:53:53)
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name          : QEMU Virt Machine
+Platform HART Features : RV64ACDFIMSU
+Platform Max HARTs     : 8
+Current Hart           : 0
+Firmware Base          : 0x80000000
+Firmware Size          : 112 KB
+Runtime SBI Version    : 0.1
+
+PMP0: 0x0000000080000000-0x000000008001ffff (A)
+PMP1: 0x0000000000000000-0xffffffffffffffff (A,R,W,X)
+DTB Init
+HartID: 0
+DTB Address: 0x82200000
+Physical Memory from DTB:
+  Base: 0x0000000080000000
+  Size: 0x0000000008000000 (128 MB)
+  End:  0x0000000087ffffff
+DTB init completed
+(THU.CST) os is loading ...
+Special kernel symbols:
+  entry  0xffffffffc02000d8 (virtual)
+  etext  0xffffffffc02041ea (virtual)
+  edata  0xffffffffc020a018 (virtual)
+  end    0xffffffffc020cb50 (virtual)
+Kernel executable memory footprint: 51KB
+memory management: best_fit_pmm_manager
+Physical memory map:
+  base: 0x0000000080000000, size: 0x0000000008000000, end: 0x0000000088000000
+check_alloc_page() succeeded!
+satp virtual address: 0xffffffffc0209000
+satp physical address: 0x0000000080209000
+slub: initialized, 31795 free pages unchanged
+[slub test] case 1: size boundaries
+[slub test] case 1 PASS
+[slub test] case 2: exact large pages
+[slub test] case 2 PASS (16385 bytes = 5 pages)
+[slub test] cases 3/4: multi-slab and immediate return
+[slub test] class=16 capacity=250
+[slub test] class=32 capacity=125
+[slub test] class=64 capacity=62
+[slub test] class=128 capacity=31
+[slub test] class=256 capacity=15
+[slub test] class=512 capacity=7
+[slub test] class=1024 capacity=3
+[slub test] class=2048 capacity=1
+[slub test] cases 3/4 PASS
+[slub test] case 5: mixed data and reuse (seed=20261024, 384 steps)
+[slub test] case 5 PASS
+[slub test] case 6: null and overflow
+[slub test] case 6 PASS (OOM injection is a separate host case)
+[slub test] case 7 PASS (native page records checked throughout)
+[slub test] ALL NORMAL PASS; baseline=31795 restored
+slub_check: 0 slabs, 0 small objects, 0 large objects (0 pages)
+qemu-system-riscv64: terminating on signal 15 from pid 50861 (make)

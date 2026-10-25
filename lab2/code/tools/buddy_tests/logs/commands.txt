@@ -1,0 +1,11 @@
+python3 tools/buddy_tests/run.py: exit=0
+make clean: exit=0
+make PMM=buddy: exit=0
+timeout 25s make PMM=buddy qemu: exit=124
+make PMM=best_fit clean: exit=0
+make PMM=best_fit: exit=0
+make PMM=best_fit grade: exit=0
+make clean: exit=0
+make PMM=buddy: exit=0
+Host: 37/37; QEMU Buddy: cases 1,2,3,5,6 PASS, no SKIP; Best-Fit grade: 20/20.
+QEMU exit 124 is the expected timeout after successful initialization.
